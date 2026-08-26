@@ -47,7 +47,6 @@ export default function Login({ onLoginSuccess }: LoginProps) {
       {/* Left panel — brand */}
       <div className="hidden w-1/3 flex-col items-center justify-center bg-zinc-900 md:flex dark:bg-zinc-950">
         <img src="/logo_full_watar-ai.png" alt="Watar-ai" className="mb-4 h-16 w-auto object-contain" />
-        <p className="text-2xl font-semibold text-white">Nexo RRHH</p>
         <p className="mt-1 text-xs font-medium uppercase tracking-wider text-zinc-500">
           Internal console
         </p>
