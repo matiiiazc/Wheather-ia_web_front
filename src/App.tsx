@@ -89,8 +89,8 @@ function App() {
         <div className="flex items-center justify-between px-5 pb-6">
           {/* Logo - Replace '/logo.png' with your actual logo file path */}
           <img 
-            src="/logo.png" 
-            alt="Nexo RRHH" 
+            src="/logo_full_watar-ai.png" 
+            alt="Watar-ai" 
             className="h-10 w-auto object-contain"
           />
           <button
