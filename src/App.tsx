@@ -12,8 +12,10 @@ import {
   Moon,
   Menu,
   X,
+  Lock,
 } from 'lucide-react';
 import Login from './components/login';
+import ChangePasswordModal from './components/ChangePasswordModal';
 import { guardarSesion, leerSesion, limpiarSesion } from './utils/session';
 import type { UsuarioLogueado } from './utils/session';
 
@@ -44,6 +46,7 @@ function App() {
   const [vista, setVista] = useState<Vista>('contractors');
   const { dark, toggle: toggleDark } = useDarkMode();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [showChangePassword, setShowChangePassword] = useState(false);
 
   useEffect(() => {
     const sesion = leerSesion();
@@ -56,6 +59,18 @@ function App() {
   const handleLoginSuccess = (data: { token: string; user: UsuarioLogueado }) => {
     guardarSesion(data.token, data.user);
     setUsuario(data.user);
+    if (data.user.mustChangePassword) {
+      setShowChangePassword(true);
+    }
+  };
+
+  const handleChangePasswordSuccess = () => {
+    if (usuario) {
+      const updated = { ...usuario, mustChangePassword: false };
+      guardarSesion(leerSesion()!.token, updated);
+      setUsuario(updated);
+    }
+    setShowChangePassword(false);
   };
 
   const handleLogout = () => {
@@ -148,6 +163,13 @@ function App() {
           </div>
         </div>
           <button
+            onClick={() => { setShowChangePassword(true); setSidebarOpen(false); }}
+            className="flex w-full items-center gap-1.5 rounded-lg border border-stone-200 bg-white py-1.5 text-xs font-medium text-zinc-500 transition-all duration-150 hover:border-amber-200 hover:bg-amber-50 hover:text-amber-600 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:border-amber-500/30 dark:hover:bg-amber-500/10 dark:hover:text-amber-300"
+          >
+            <Lock size={13} />
+            Change password
+          </button>
+          <button
             onClick={handleLogout}
             className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-stone-200 bg-white py-1.5 text-xs font-medium text-zinc-500 transition-all duration-150 hover:border-red-200 hover:bg-red-50 hover:text-red-600 hover:scale-[1.01] dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:border-red-500/30 dark:hover:bg-red-500/10 dark:hover:text-red-300"
           >
@@ -204,6 +226,13 @@ function App() {
           </Suspense>
         </div>
       </main>
+
+      {(showChangePassword || usuario.mustChangePassword) && (
+        <ChangePasswordModal
+          obligatory={!!usuario.mustChangePassword}
+          onSuccess={handleChangePasswordSuccess}
+        />
+      )}
     </div>
   );
 }

@@ -2,6 +2,7 @@ export interface UsuarioLogueado {
   id: string;
   nombre: string;
   rol: 'admin' | 'rrhh' | 'empleado';
+  mustChangePassword?: boolean;
 }
 
 interface SesionGuardada {
