@@ -217,7 +217,7 @@ export default function PaymentsPage() {
   const labelClass = 'mb-1 block text-xs font-medium text-zinc-500 dark:text-zinc-400';
 
   return (
-    <div className="mx-auto max-w-5xl p-6">
+    <div className="mx-auto max-w-5xl p-4 sm:p-6">
       <h1 className="mb-4 text-xl font-bold tracking-tight text-zinc-900 dark:text-white">Payments</h1>
 
       <PageToolbar
@@ -251,7 +251,7 @@ export default function PaymentsPage() {
       ) : (
         <div className="overflow-hidden rounded-2xl border border-stone-200 bg-stone-50 dark:border-zinc-800 dark:bg-zinc-900">
           <div className="max-h-[65vh] overflow-auto">
-          <table className="w-full text-left text-sm">
+          <table className="w-full min-w-[600px] text-left text-sm">
             <thead className="sticky top-0 bg-stone-50 dark:bg-zinc-900">
               <tr className="border-b border-stone-200 text-xs font-semibold uppercase tracking-wide text-zinc-400 dark:border-zinc-800 dark:text-zinc-500">
 
@@ -323,7 +323,7 @@ export default function PaymentsPage() {
 
       {modalAbierto && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/40 p-4">
-          <div className="max-h-[85vh] w-full max-w-md overflow-y-auto rounded-2xl border border-stone-200 bg-white p-6 shadow-lg dark:border-zinc-800 dark:bg-zinc-900">
+          <div className="max-h-[85vh] w-full max-w-md overflow-y-auto rounded-2xl border border-stone-200 bg-white p-4 shadow-lg sm:p-6 dark:border-zinc-800 dark:bg-zinc-900">
             <h2 className="mb-4 text-lg font-bold tracking-tight text-zinc-900 dark:text-white">Nuevo pago</h2>
 
             <form onSubmit={handleGuardar} className="flex flex-col gap-3">
@@ -485,7 +485,7 @@ export default function PaymentsPage() {
 
       {editandoPago && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/40 p-4">
-          <div className="max-h-[85vh] w-full max-w-md overflow-y-auto rounded-2xl border border-stone-200 bg-white p-6 shadow-lg dark:border-zinc-800 dark:bg-zinc-900">
+          <div className="max-h-[85vh] w-full max-w-md overflow-y-auto rounded-2xl border border-stone-200 bg-white p-4 shadow-lg sm:p-6 dark:border-zinc-800 dark:bg-zinc-900">
             <h2 className="mb-4 text-lg font-bold tracking-tight text-zinc-900 dark:text-white">
               {editandoPago.contractor?.nombreCompleto}
             </h2>

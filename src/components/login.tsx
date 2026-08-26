@@ -46,6 +46,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
     <div className="flex min-h-screen">
       {/* Left panel — brand */}
       <div className="hidden w-1/3 flex-col items-center justify-center bg-zinc-900 md:flex dark:bg-zinc-950">
+        <img src="/logo_full_watar-ai.png" alt="Watar-ai" className="mb-4 h-16 w-auto object-contain" />
         <p className="text-2xl font-semibold text-white">Nexo RRHH</p>
         <p className="mt-1 text-xs font-medium uppercase tracking-wider text-zinc-500">
           Internal console
@@ -54,7 +55,12 @@ export default function Login({ onLoginSuccess }: LoginProps) {
 
       {/* Login form */}
       <div className="flex flex-1 items-center justify-center bg-stone-100 px-4 dark:bg-zinc-950">
-        <div className="w-full max-w-sm rounded-2xl border border-stone-200 bg-white p-8 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="w-full max-w-sm rounded-2xl border border-stone-200 bg-white p-6 shadow-sm sm:p-8 dark:border-zinc-800 dark:bg-zinc-900">
+          {/* Mobile logo */}
+          <div className="mb-6 text-center md:hidden">
+            <img src="/logo_full_watar-ai.png" alt="Watar-ai" className="mx-auto mb-3 h-12 w-auto object-contain" />
+          </div>
+
           <div className="mb-6 text-center">
             <h1 className="mt-1 text-xl font-semibold text-zinc-900 dark:text-white">
               Iniciar sesión

@@ -228,7 +228,7 @@ export default function HiredPage() {
   const DOCUMENT_FIELDS = ['resume', 'agreement', 'governmentId', 'photoIdVerification', 'passport', 'backgroundCheck', 'taxFormsSigned', 'utilityBill', 'documentationFolder'];
 
   return (
-    <div className="mx-auto max-w-5xl p-6">
+    <div className="mx-auto max-w-5xl p-4 sm:p-6">
       <h1 className="mb-4 text-xl font-bold tracking-tight text-zinc-900 dark:text-white">Hired</h1>
 
       <PageToolbar
@@ -262,7 +262,7 @@ export default function HiredPage() {
       ) : (
         <div className="overflow-hidden rounded-2xl border border-stone-200 bg-stone-50 dark:border-zinc-800 dark:bg-zinc-900">
           <div className="max-h-[65vh] overflow-auto">
-          <table className="w-full text-left text-sm">
+          <table className="w-full min-w-[600px] text-left text-sm">
             <thead className="sticky top-0 bg-stone-50 dark:bg-zinc-900">
               <tr className="border-b border-stone-200 text-xs font-semibold uppercase tracking-wide text-zinc-400 dark:border-zinc-800 dark:text-zinc-500">
 
@@ -321,7 +321,7 @@ export default function HiredPage() {
 
       {editando && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/40 p-4">
-          <div className="max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-stone-200 bg-white p-6 shadow-lg dark:border-zinc-800 dark:bg-zinc-900">
+          <div className="max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-stone-200 bg-white p-4 shadow-lg sm:p-6 dark:border-zinc-800 dark:bg-zinc-900">
             <h2 className="mb-4 text-lg font-bold tracking-tight text-zinc-900 dark:text-white">
               {creandoNuevo ? 'New hire' : `Editar: ${editando.name}`}
             </h2>
@@ -339,7 +339,7 @@ export default function HiredPage() {
               </div>
               <div>
                 <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-400 dark:text-zinc-500">Personal Info</p>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <div>
                     <label className="mb-1 block text-xs font-medium text-zinc-500 dark:text-zinc-400">Fecha de ingreso</label>
                     <input
@@ -383,7 +383,7 @@ export default function HiredPage() {
 
               <div>
                 <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-400 dark:text-zinc-500">Onboarding</p>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   {CAMPOS_ONBOARDING.map(({ key, label }) => (
                     <div key={key}>
                       <label className="mb-1 block text-xs font-medium text-zinc-500 dark:text-zinc-400">{label}</label>
@@ -400,7 +400,7 @@ export default function HiredPage() {
 
               <div>
                 <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-400 dark:text-zinc-500">Bank Details</p>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   {CAMPOS_BANCO.map(({ key, label }) => (
                     <div key={key}>
                       <label className="mb-1 block text-xs font-medium text-zinc-500 dark:text-zinc-400">{label}</label>
@@ -417,7 +417,7 @@ export default function HiredPage() {
 
               <div>
                 <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-400 dark:text-zinc-500">Documents</p>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   {CAMPOS_ARCHIVOS.map(({ key, label }) => (
                     <FileField
                       key={key}
