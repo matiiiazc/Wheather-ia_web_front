@@ -19,8 +19,8 @@ export default function DocumentPreview({ url, filename, onClose }: DocumentPrev
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-      <div className="flex h-full max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-2xl dark:border-zinc-800 dark:bg-zinc-900">
+    <div className="modal-backdrop fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+      <div className="modal-content flex h-full max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-2xl dark:border-zinc-800 dark:bg-zinc-900">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-stone-200 px-5 py-3 dark:border-zinc-800">
           <h3 className="text-sm font-semibold text-zinc-900 dark:text-white">
@@ -46,7 +46,7 @@ export default function DocumentPreview({ url, filename, onClose }: DocumentPrev
         </div>
 
         {/* Preview Content */}
-        <div className="flex-1 overflow-auto bg-stone-50 p-4 dark:bg-zinc-950">
+        <div className="flex-1 scroll-smooth overflow-auto bg-stone-50 p-4 dark:bg-zinc-950">
           {isImage && (
             <div className="flex h-full items-center justify-center">
               <img

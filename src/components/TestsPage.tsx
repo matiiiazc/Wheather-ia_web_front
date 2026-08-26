@@ -1,7 +1,8 @@
-import { useState, useEffect, type FormEvent } from 'react';
+import { useState, useEffect, useMemo, type FormEvent } from 'react';
 import { apiFetch } from '../utils/api';
 import PageToolbar from './PageToolbar';
 import FilterBar from './FilterBar';
+import { useToast } from './Toast';
 
 const HIRING_MANAGER_OPTIONS = ['PABLO', 'JOSE'];
 
@@ -38,6 +39,7 @@ const testVacio = {
 };
 
 export default function TestsPage() {
+  const { toast } = useToast();
   const [tests, setTests] = useState<Test[]>([]);
   const [busqueda, setBusqueda] = useState('');
   const [filterOpen, setFilterOpen] = useState(false);
@@ -53,7 +55,7 @@ export default function TestsPage() {
 
   const hasActiveFilters = !!filterManager;
 
-  const testsFiltrados = tests.filter((t) => {
+  const testsFiltrados = useMemo(() => tests.filter((t) => {
     if (busqueda.trim()) {
       const texto = busqueda.toLowerCase();
       const valores = [t.nombre, t.codingTest, t.score, t.hiringManager, t.interviewIgal, t.igalFeedback, t.recommendation];
@@ -61,7 +63,7 @@ export default function TestsPage() {
     }
     if (filterManager && t.hiringManager !== filterManager) return false;
     return true;
-  });
+  }), [tests, busqueda, filterManager]);
 
   async function cargar() {
     setCargando(true);
@@ -86,7 +88,10 @@ export default function TestsPage() {
     try {
       await apiFetch('/tests', { method: 'POST', body: JSON.stringify(nuevo) });
       setModalAbierto(false);
+      toast('Test created successfully');
       await cargar();
+    } catch (err) {
+      toast(err instanceof Error ? err.message : 'Error creating test', 'error');
     } finally {
       setGuardando(false);
     }
@@ -99,7 +104,10 @@ export default function TestsPage() {
     try {
       await apiFetch(`/tests/${editando.id}`, { method: 'PUT', body: JSON.stringify(editando) });
       setEditando(null);
+      toast('Test updated successfully');
       await cargar();
+    } catch (err) {
+      toast(err instanceof Error ? err.message : 'Error updating test', 'error');
     } finally {
       setGuardandoEdicion(false);
     }
@@ -134,7 +142,7 @@ export default function TestsPage() {
         <p className="text-sm text-zinc-400 dark:text-zinc-500">Loading...</p>
       ) : (
         <div className="overflow-hidden rounded-2xl border border-stone-200 bg-stone-50 dark:border-zinc-800 dark:bg-zinc-900">
-          <div className="max-h-[65vh] overflow-auto">
+          <div className="max-h-[65vh] scroll-smooth overflow-auto">
           <table className="w-full min-w-[600px] text-left text-sm">
             <thead className="sticky top-0 bg-stone-50 dark:bg-zinc-900">
               <tr className="border-b border-stone-200 text-xs font-semibold uppercase tracking-wide text-zinc-400 dark:border-zinc-800 dark:text-zinc-500">
@@ -150,10 +158,10 @@ export default function TestsPage() {
             </thead>
             <tbody>
               {testsFiltrados.map((t) => (
-                <tr key={t.id} className="border-b border-stone-100 last:border-0 hover:bg-stone-100/60 dark:border-zinc-800 dark:hover:bg-white/5">
+                <tr key={t.id} className="border-b border-stone-100 last:border-0 transition-colors duration-100 hover:bg-stone-100/80 dark:border-zinc-800 dark:hover:bg-white/[0.07]">
                   {editMode && (
                     <td className="whitespace-nowrap px-4 py-3 text-right">
-                      <button onClick={() => setEditando(t)} className="text-sm font-medium text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-teal-400">
+                      <button onClick={() => setEditando(t)}                       className="text-sm font-medium text-zinc-500 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-teal-400">
                         Editar
                       </button>
                     </td>
@@ -174,8 +182,8 @@ export default function TestsPage() {
       )}
 
       {modalAbierto && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/40 p-4">
-          <div className="max-h-[85vh] w-full max-w-md overflow-y-auto rounded-2xl border border-stone-200 bg-white p-4 shadow-lg sm:p-6 dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="modal-backdrop fixed inset-0 flex items-center justify-center bg-black/40 p-4">
+          <div className="modal-content max-h-[85vh] w-full max-w-md scroll-smooth overflow-y-auto rounded-2xl border border-stone-200 bg-white p-4 shadow-lg sm:p-6 dark:border-zinc-800 dark:bg-zinc-900">
             <h2 className="mb-4 text-lg font-bold tracking-tight text-zinc-900 dark:text-white">New test</h2>
             <form onSubmit={handleGuardar} className="flex flex-col gap-3">
               <div>
@@ -218,8 +226,8 @@ export default function TestsPage() {
       )}
 
       {editando && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/40 p-4">
-          <div className="max-h-[85vh] w-full max-w-md overflow-y-auto rounded-2xl border border-stone-200 bg-white p-4 shadow-lg sm:p-6 dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="modal-backdrop fixed inset-0 flex items-center justify-center bg-black/40 p-4">
+          <div className="modal-content max-h-[85vh] w-full max-w-md scroll-smooth overflow-y-auto rounded-2xl border border-stone-200 bg-white p-4 shadow-lg sm:p-6 dark:border-zinc-800 dark:bg-zinc-900">
             <h2 className="mb-4 text-lg font-bold tracking-tight text-zinc-900 dark:text-white">{editando.nombre}</h2>
             <form onSubmit={handleGuardarEdicion} className="flex flex-col gap-3">
               <div>

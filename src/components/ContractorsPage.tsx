@@ -1,7 +1,8 @@
-import { useState, useEffect, type FormEvent } from 'react';
+import { useState, useEffect, useMemo, type FormEvent } from 'react';
 import { apiFetch } from '../utils/api';
 import PageToolbar from './PageToolbar';
 import FilterBar from './FilterBar';
+import { useToast } from './Toast';
 
 const CURRENCY_OPTIONS = ['USD', 'EUR', 'ARS', 'GBP', 'BRL'];
 
@@ -45,6 +46,7 @@ const CAMPOS_FORM: { key: keyof Contractor; label: string }[] = [
 ];
 
 export default function ContractorsPage() {
+  const { toast } = useToast();
   const [contractors, setContractors] = useState<Contractor[]>([]);
   const [busqueda, setBusqueda] = useState('');
   const [filterOpen, setFilterOpen] = useState(false);
@@ -54,14 +56,14 @@ export default function ContractorsPage() {
 
   const hasActiveFilters = !!filterCurrency;
 
-  const contractorsFiltrados = contractors.filter((c) => {
+  const contractorsFiltrados = useMemo(() => contractors.filter((c) => {
     if (busqueda.trim()) {
       const texto = busqueda.toLowerCase();
       if (!CAMPOS_FORM.some(({ key }) => String(c[key] ?? '').toLowerCase().includes(texto))) return false;
     }
     if (filterCurrency && c.currency !== filterCurrency) return false;
     return true;
-  });
+  }), [contractors, busqueda, filterCurrency]);
   const [editando, setEditando] = useState<Contractor | null>(null); // null = modal cerrado
   const [creandoNuevo, setCreandoNuevo] = useState(false);
   const [guardando, setGuardando] = useState(false);
@@ -109,21 +111,24 @@ export default function ContractorsPage() {
     e.preventDefault();
     if (!editando) return;
     setGuardando(true);
-
     try {
       if (creandoNuevo) {
         await apiFetch('/contractors', {
           method: 'POST',
           body: JSON.stringify(editando),
         });
+        toast('Contractor created successfully');
       } else {
         await apiFetch(`/contractors/${editando.id}`, {
           method: 'PUT',
           body: JSON.stringify(editando),
         });
+        toast('Contractor updated successfully');
       }
       setEditando(null);
       await cargarContractors();
+    } catch (err) {
+      toast(err instanceof Error ? err.message : 'Error saving contractor', 'error');
     } finally {
       setGuardando(false);
     }
@@ -158,7 +163,7 @@ export default function ContractorsPage() {
         <p className="text-sm text-zinc-400 dark:text-zinc-500">Loading...</p>
       ) : (
         <div className="overflow-hidden rounded-2xl border border-stone-200 bg-stone-50 dark:border-zinc-800 dark:bg-zinc-900">
-          <div className="max-h-[65vh] overflow-auto">
+          <div className="max-h-[65vh] scroll-smooth overflow-auto">
           <table className="w-full min-w-[600px] text-left text-sm">
             <thead className="sticky top-0 bg-stone-50 dark:bg-zinc-900">
               <tr className="border-b border-stone-200 text-xs font-semibold uppercase tracking-wide text-zinc-400 dark:border-zinc-800 dark:text-zinc-500">
@@ -170,13 +175,13 @@ export default function ContractorsPage() {
             </thead>
             <tbody>
               {contractorsFiltrados.map((c) => (
-                <tr key={c.id} className="border-b border-stone-100 last:border-0 hover:bg-stone-100/60 dark:border-zinc-800 dark:hover:bg-white/5">
+                <tr key={c.id} className="border-b border-stone-100 last:border-0 transition-colors duration-100 hover:bg-stone-100/80 dark:border-zinc-800 dark:hover:bg-white/[0.07]">
 
                   {editMode && (
                     <td className="whitespace-nowrap px-4 py-3 text-right">
                       <button
                         onClick={() => abrirEdit(c)}
-                        className="text-sm font-medium text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-teal-400"
+                        className="text-sm font-medium text-zinc-500 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-teal-400"
                       >
                         Edit
                       </button>
@@ -196,8 +201,8 @@ export default function ContractorsPage() {
 
       {/* Modal de alta/edición */}
       {editando && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/40 p-4">
-          <div className="max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-stone-200 bg-white p-4 shadow-lg sm:p-6 dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="modal-backdrop fixed inset-0 flex items-center justify-center bg-black/40 p-4">
+          <div className="modal-content max-h-[85vh] w-full max-w-lg scroll-smooth overflow-y-auto rounded-2xl border border-stone-200 bg-white p-4 shadow-lg sm:p-6 dark:border-zinc-800 dark:bg-zinc-900">
             <h2 className="mb-4 text-lg font-bold tracking-tight text-zinc-900 dark:text-white">
               {creandoNuevo ? 'New contractor' : `Edit: ${editando.nombreCompleto}`}
             </h2>

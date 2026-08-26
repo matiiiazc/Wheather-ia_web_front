@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, lazy, Suspense } from 'react';
 import {
   Users,
   Wallet,
@@ -14,15 +14,16 @@ import {
   X,
 } from 'lucide-react';
 import Login from './components/login';
-import ContractorsPage from './components/ContractorsPage';
-import PaymentsPage from './components/PaymentsPage';
-import AbsencePage from './components/AbsencePage';
-import CandidatesPage from './components/CandidatesPage';
-import TestsPage from './components/TestsPage';
-import HiredPage from './components/HiredPage';
-import OffboardedPage from './components/OffboardedPage';
 import { guardarSesion, leerSesion, limpiarSesion } from './utils/session';
 import type { UsuarioLogueado } from './utils/session';
+
+const ContractorsPage = lazy(() => import('./components/ContractorsPage'));
+const PaymentsPage = lazy(() => import('./components/PaymentsPage'));
+const AbsencePage = lazy(() => import('./components/AbsencePage'));
+const CandidatesPage = lazy(() => import('./components/CandidatesPage'));
+const TestsPage = lazy(() => import('./components/TestsPage'));
+const HiredPage = lazy(() => import('./components/HiredPage'));
+const OffboardedPage = lazy(() => import('./components/OffboardedPage'));
 
 type Vista = 'contractors' | 'payments' | 'absences' | 'candidates' | 'tests' | 'hired' | 'offboarded';
 
@@ -126,7 +127,7 @@ function App() {
               className={`flex items-center gap-2.5 rounded-full px-3.5 py-2 text-left text-sm font-medium transition-all duration-150 ${
                 activo
                   ? 'bg-zinc-900 text-white shadow-sm dark:bg-teal-500 dark:text-zinc-950'
-                  : 'text-zinc-500 hover:bg-zinc-200/60 hover:text-zinc-800 dark:text-zinc-400 dark:hover:bg-white/5 dark:hover:text-zinc-100'
+                  : 'text-zinc-500 hover:bg-zinc-200/60 hover:text-zinc-800 hover:scale-[1.02] dark:text-zinc-400 dark:hover:bg-white/5 dark:hover:text-zinc-100'
               }`}
             >
               <Icon size={16} strokeWidth={2} />
@@ -146,10 +147,10 @@ function App() {
             <p className="text-xs capitalize text-zinc-400 dark:text-zinc-500">{usuario.rol}</p>
           </div>
         </div>
-        <button
-          onClick={handleLogout}
-          className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-stone-200 bg-white py-1.5 text-xs font-medium text-zinc-500 transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-600 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:border-red-500/30 dark:hover:bg-red-500/10 dark:hover:text-red-300"
-        >
+          <button
+            onClick={handleLogout}
+            className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-stone-200 bg-white py-1.5 text-xs font-medium text-zinc-500 transition-all duration-150 hover:border-red-200 hover:bg-red-50 hover:text-red-600 hover:scale-[1.01] dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:border-red-500/30 dark:hover:bg-red-500/10 dark:hover:text-red-300"
+          >
           <LogOut size={13} />
           Log out
         </button>
@@ -190,14 +191,18 @@ function App() {
       </aside>
 
       {/* Contenido */}
-      <main className="min-w-0 flex-1 overflow-y-auto pt-12 pl-2 sm:pl-3 md:pt-0 md:pl-3">
-        {vista === 'contractors' && <ContractorsPage />}
-        {vista === 'payments' && <PaymentsPage />}
-        {vista === 'absences' && <AbsencePage />}
-        {vista === 'candidates' && <CandidatesPage />}
-        {vista === 'tests' && <TestsPage />}
-        {vista === 'hired' && <HiredPage />}
-        {vista === 'offboarded' && <OffboardedPage />}
+      <main className="min-w-0 flex-1 overflow-y-auto scroll-smooth pt-12 pl-2 sm:pl-3 md:pt-0 md:pl-3">
+        <div key={vista} className="page-transition">
+          <Suspense fallback={<div className="p-6 text-sm text-zinc-400 dark:text-zinc-500">Loading...</div>}>
+            {vista === 'contractors' && <ContractorsPage />}
+            {vista === 'payments' && <PaymentsPage />}
+            {vista === 'absences' && <AbsencePage />}
+            {vista === 'candidates' && <CandidatesPage />}
+            {vista === 'tests' && <TestsPage />}
+            {vista === 'hired' && <HiredPage />}
+            {vista === 'offboarded' && <OffboardedPage />}
+          </Suspense>
+        </div>
       </main>
     </div>
   );

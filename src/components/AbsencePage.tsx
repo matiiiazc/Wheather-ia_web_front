@@ -1,7 +1,8 @@
-import { useState, useEffect, type FormEvent } from 'react';
+import { useState, useEffect, useMemo, type FormEvent } from 'react';
 import { apiFetch } from '../utils/api';
 import PageToolbar from './PageToolbar';
 import FilterBar from './FilterBar';
+import { useToast } from './Toast';
 
 interface Contractor {
   id: string;
@@ -41,6 +42,7 @@ const ausenciaVacia = {
 };
 
 export default function AbsencePage() {
+  const { toast } = useToast();
   const [ausencias, setAusencias] = useState<Ausencia[]>([]);
   const [busqueda, setBusqueda] = useState('');
   const [filterOpen, setFilterOpen] = useState(false);
@@ -49,7 +51,7 @@ export default function AbsencePage() {
 
   const hasActiveFilters = !!filterDateFrom || !!filterDateTo;
 
-  const ausenciasFiltradas = ausencias.filter((a) => {
+  const ausenciasFiltradas = useMemo(() => ausencias.filter((a) => {
     if (busqueda.trim()) {
       const texto = busqueda.toLowerCase();
       const valores = [a.contractor?.nombreCompleto, a.contractorName, a.reason, a.notesComments];
@@ -62,7 +64,7 @@ export default function AbsencePage() {
       if (filterDateTo && d > filterDateTo) return false;
     }
     return true;
-  });
+  }), [ausencias, busqueda, filterDateFrom, filterDateTo]);
   const [contractors, setContractors] = useState<Contractor[]>([]);
   const [cargando, setCargando] = useState(true);
   const [editMode, setEditMode] = useState(false);
@@ -103,7 +105,10 @@ export default function AbsencePage() {
         body: JSON.stringify(nuevo),
       });
       setModalAbierto(false);
+      toast('Absence created successfully');
       await cargarTodo();
+    } catch (err) {
+      toast(err instanceof Error ? err.message : 'Error creating absence', 'error');
     } finally {
       setGuardando(false);
     }
@@ -119,7 +124,10 @@ export default function AbsencePage() {
         body: JSON.stringify(editando),
       });
       setEditando(null);
+      toast('Absence updated successfully');
       await cargarTodo();
+    } catch (err) {
+      toast(err instanceof Error ? err.message : 'Error updating absence', 'error');
     } finally {
       setGuardandoEdicion(false);
     }
@@ -155,7 +163,7 @@ export default function AbsencePage() {
         <p className="text-sm text-zinc-400 dark:text-zinc-500">Loading...</p>
       ) : (
         <div className="overflow-hidden rounded-2xl border border-stone-200 bg-stone-50 dark:border-zinc-800 dark:bg-zinc-900">
-          <div className="max-h-[65vh] overflow-auto">
+          <div className="max-h-[65vh] scroll-smooth overflow-auto">
           <table className="w-full min-w-[600px] text-left text-sm">
             <thead className="sticky top-0 bg-stone-50 dark:bg-zinc-900">
               <tr className="border-b border-stone-200 text-xs font-semibold uppercase tracking-wide text-zinc-400 dark:border-zinc-800 dark:text-zinc-500">
@@ -173,13 +181,13 @@ export default function AbsencePage() {
             </thead>
             <tbody>
               {ausenciasFiltradas.map((a) => (
-                <tr key={a.id} className="border-b border-stone-100 last:border-0 hover:bg-stone-100/60 dark:border-zinc-800 dark:hover:bg-white/5">
+                <tr key={a.id} className="border-b border-stone-100 last:border-0 transition-colors duration-100 hover:bg-stone-100/80 dark:border-zinc-800 dark:hover:bg-white/[0.07]">
 
                   {editMode && (
                     <td className="whitespace-nowrap px-4 py-3 text-right">
                       <button
                         onClick={() => setEditando(a)}
-                        className="text-sm font-medium text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-teal-400"
+                        className="text-sm font-medium text-zinc-500 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-teal-400"
                       >
                         Editar
                       </button>
@@ -206,8 +214,8 @@ export default function AbsencePage() {
       )}
 
       {modalAbierto && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/40 p-4">
-          <div className="max-h-[85vh] w-full max-w-md overflow-y-auto rounded-2xl border border-stone-200 bg-white p-4 shadow-lg sm:p-6 dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="modal-backdrop fixed inset-0 flex items-center justify-center bg-black/40 p-4">
+          <div className="modal-content max-h-[85vh] w-full max-w-md scroll-smooth overflow-y-auto rounded-2xl border border-stone-200 bg-white p-4 shadow-lg sm:p-6 dark:border-zinc-800 dark:bg-zinc-900">
             <h2 className="mb-4 text-lg font-bold tracking-tight text-zinc-900 dark:text-white">New absence</h2>
 
             <form onSubmit={handleGuardar} className="flex flex-col gap-3">
@@ -283,8 +291,8 @@ export default function AbsencePage() {
       )}
 
       {editando && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/40 p-4">
-          <div className="max-h-[85vh] w-full max-w-md overflow-y-auto rounded-2xl border border-stone-200 bg-white p-4 shadow-lg sm:p-6 dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="modal-backdrop fixed inset-0 flex items-center justify-center bg-black/40 p-4">
+          <div className="modal-content max-h-[85vh] w-full max-w-md scroll-smooth overflow-y-auto rounded-2xl border border-stone-200 bg-white p-4 shadow-lg sm:p-6 dark:border-zinc-800 dark:bg-zinc-900">
             <h2 className="mb-4 text-lg font-bold tracking-tight text-zinc-900 dark:text-white">
               {editando.contractor?.nombreCompleto || editando.contractorName}
             </h2>

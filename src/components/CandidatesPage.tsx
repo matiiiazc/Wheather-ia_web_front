@@ -1,4 +1,4 @@
-import { useState, useEffect, type FormEvent } from 'react';
+import { useState, useEffect, useMemo, type FormEvent } from 'react';
 import { Check, X, Loader2 } from 'lucide-react';
 import { apiFetch } from '../utils/api';
 import FileField from './FileField';
@@ -6,6 +6,7 @@ import PageToolbar from './PageToolbar';
 import FilterBar from './FilterBar';
 import InlineStatusSelect from './InlineStatusSelect';
 import DocumentLink from './DocumentLink';
+import { useToast } from './Toast';
 
 const STAGES_OPTIONS = [
   'Invite candidate to Interview',
@@ -95,6 +96,7 @@ const candidatoVacio: Candidato = {
 };
 
 export default function CandidatesPage() {
+  const { toast } = useToast();
   const [candidatos, setCandidatos] = useState<Candidato[]>([]);
   const [busqueda, setBusqueda] = useState('');
   const [filterOpen, setFilterOpen] = useState(false);
@@ -110,7 +112,7 @@ export default function CandidatesPage() {
 
   const hasActiveFilters = !!filterStage || !!filterDateFrom || !!filterDateTo;
 
-  const candidatosFiltrados = candidatos.filter((c) => {
+  const candidatosFiltrados = useMemo(() => candidatos.filter((c) => {
     if (busqueda.trim()) {
       const texto = busqueda.toLowerCase();
       const matchText = TODAS_LAS_COLUMNAS.some(({ key }) =>
@@ -126,7 +128,7 @@ export default function CandidatesPage() {
       if (filterDateTo && d > filterDateTo) return false;
     }
     return true;
-  });
+  }), [candidatos, busqueda, filterStage, filterDateFrom, filterDateTo]);
 
   async function cargar() {
     setCargando(true);
@@ -159,14 +161,18 @@ export default function CandidatesPage() {
           method: 'POST',
           body: JSON.stringify(editando),
         });
+        toast('Candidate created successfully');
       } else {
         await apiFetch(`/candidates/${editando.id}`, {
           method: 'PUT',
           body: JSON.stringify(editando),
         });
+        toast('Candidate updated successfully');
       }
       setEditando(null);
       await cargar();
+    } catch (err) {
+      toast(err instanceof Error ? err.message : 'Error saving candidate', 'error');
     } finally {
       setGuardando(false);
     }
@@ -176,28 +182,33 @@ export default function CandidatesPage() {
     if (!linkedinUrl) return;
     setVerificandoLinkedIn(candidatoId);
     try {
-      // Call your backend API to verify LinkedIn profile
       const result = await apiFetch(`/candidates/${candidatoId}/verify-linkedin`, {
         method: 'POST',
         body: JSON.stringify({ linkedinUrl }),
       });
-      // Update local state with verification result
       setCandidatos(prev => prev.map(c => 
         c.id === candidatoId ? { ...c, profileVerified: result.verified ? 'Yes' : 'No' } : c
       ));
+      toast(result.verified ? 'LinkedIn verified' : 'LinkedIn not verified', result.verified ? 'success' : 'warning');
     } catch (error) {
       console.error('Error verificando LinkedIn:', error);
+      toast('Error verifying LinkedIn', 'error');
     } finally {
       setVerificandoLinkedIn(null);
     }
   }
 
   async function handleStageChange(candidatoId: string, newStage: string) {
-    await apiFetch(`/candidates/${candidatoId}`, {
-      method: 'PUT',
-      body: JSON.stringify({ stages: newStage }),
-    });
-    setCandidatos(prev => prev.map(c => c.id === candidatoId ? { ...c, stages: newStage } : c));
+    try {
+      await apiFetch(`/candidates/${candidatoId}`, {
+        method: 'PUT',
+        body: JSON.stringify({ stages: newStage }),
+      });
+      setCandidatos(prev => prev.map(c => c.id === candidatoId ? { ...c, stages: newStage } : c));
+      toast('Stage updated');
+    } catch {
+      toast('Error updating stage', 'error');
+    }
   }
 
   return (
@@ -234,7 +245,7 @@ export default function CandidatesPage() {
         <p className="text-sm text-zinc-400 dark:text-zinc-500">Loading...</p>
       ) : (
         <div className="overflow-hidden rounded-2xl border border-stone-200 bg-stone-50 dark:border-zinc-800 dark:bg-zinc-900">
-          <div className="max-h-[65vh] overflow-auto">
+          <div className="max-h-[65vh] scroll-smooth overflow-auto">
           <table className="w-full min-w-[600px] text-left text-sm">
             <thead className="sticky top-0 bg-stone-50 dark:bg-zinc-900">
               <tr className="border-b border-stone-200 text-xs font-semibold uppercase tracking-wide text-zinc-400 dark:border-zinc-800 dark:text-zinc-500">
@@ -246,13 +257,13 @@ export default function CandidatesPage() {
             </thead>
             <tbody>
               {candidatosFiltrados.map((c) => (
-                <tr key={c.id} className="border-b border-stone-100 last:border-0 hover:bg-stone-100/60 dark:border-zinc-800 dark:hover:bg-white/5">
+                <tr key={c.id} className="border-b border-stone-100 last:border-0 transition-colors duration-100 hover:bg-stone-100/80 dark:border-zinc-800 dark:hover:bg-white/[0.07]">
 
                   {editMode && (
                     <td className="whitespace-nowrap px-4 py-3 text-right">
                       <button
                         onClick={() => abrirEditar(c)}
-                        className="text-sm font-medium text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-teal-400"
+                        className="text-sm font-medium text-zinc-500 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-teal-400"
                       >
                         Editar
                       </button>
@@ -346,8 +357,8 @@ export default function CandidatesPage() {
       )}
 
       {editando && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/40 p-4">
-          <div className="max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-stone-200 bg-white p-4 shadow-lg sm:p-6 dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="modal-backdrop fixed inset-0 flex items-center justify-center bg-black/40 p-4">
+          <div className="modal-content max-h-[85vh] w-full max-w-2xl scroll-smooth overflow-y-auto rounded-2xl border border-stone-200 bg-white p-4 shadow-lg sm:p-6 dark:border-zinc-800 dark:bg-zinc-900">
             <h2 className="mb-4 text-lg font-bold tracking-tight text-zinc-900 dark:text-white">
               {creandoNuevo ? 'New candidate' : `Editar: ${editando.name}`}
             </h2>

@@ -1,7 +1,8 @@
-import { useState, useEffect, type FormEvent } from 'react';
+import { useState, useEffect, useMemo, type FormEvent } from 'react';
 import { apiFetch } from '../utils/api';
 import PageToolbar from './PageToolbar';
 import FilterBar from './FilterBar';
+import { useToast } from './Toast';
 
 const OFFBOARDED_STATUS_OPTIONS = ['Active', 'Contract Ended'];
 const COUNTRY_OPTIONS = ['Argentina', 'Spain', 'Brazil', 'Colombia', 'Chile', 'Peru', 'Mexico', 'Other'];
@@ -102,6 +103,7 @@ const CAMPOS_COMPLIANCE: { key: keyof Persona; label: string }[] = [
 ];
 
 export default function OffboardedPage() {
+  const { toast } = useToast();
   const [personas, setPersonas] = useState<Persona[]>([]);
   const [busqueda, setBusqueda] = useState('');
   const [filterOpen, setFilterOpen] = useState(false);
@@ -115,7 +117,7 @@ export default function OffboardedPage() {
 
   const hasActiveFilters = !!filterStatus || !!filterCountry;
 
-  const personasFiltradas = personas.filter((p) => {
+  const personasFiltradas = useMemo(() => personas.filter((p) => {
     if (busqueda.trim()) {
       const texto = busqueda.toLowerCase();
       if (!TODAS_LAS_COLUMNAS.some(({ key }) => String(p[key] ?? '').toLowerCase().includes(texto))) return false;
@@ -123,7 +125,7 @@ export default function OffboardedPage() {
     if (filterStatus && p.status !== filterStatus) return false;
     if (filterCountry && (p.country ?? '') !== filterCountry) return false;
     return true;
-  });
+  }), [personas, busqueda, filterStatus, filterCountry]);
 
   const personaVacia: Persona = {
     id: '', name: '', country: null, resume: null, status: null,
@@ -166,14 +168,18 @@ export default function OffboardedPage() {
           method: 'POST',
           body: JSON.stringify(editando),
         });
+        toast('Offboarded created successfully');
       } else {
         await apiFetch(`/offboarded/${editando.id}`, {
           method: 'PUT',
           body: JSON.stringify(editando),
         });
+        toast('Offboarded updated successfully');
       }
       setEditando(null);
       await cargar();
+    } catch (err) {
+      toast(err instanceof Error ? err.message : 'Error saving offboarded', 'error');
     } finally {
       setGuardando(false);
     }
@@ -212,7 +218,7 @@ export default function OffboardedPage() {
         <p className="text-sm text-zinc-400 dark:text-zinc-500">Loading...</p>
       ) : (
         <div className="overflow-hidden rounded-2xl border border-stone-200 bg-stone-50 dark:border-zinc-800 dark:bg-zinc-900">
-          <div className="max-h-[65vh] overflow-auto">
+          <div className="max-h-[65vh] scroll-smooth overflow-auto">
           <table className="w-full min-w-[600px] text-left text-sm">
             <thead className="sticky top-0 bg-stone-50 dark:bg-zinc-900">
               <tr className="border-b border-stone-200 text-xs font-semibold uppercase tracking-wide text-zinc-400 dark:border-zinc-800 dark:text-zinc-500">
@@ -224,13 +230,13 @@ export default function OffboardedPage() {
             </thead>
             <tbody>
               {personasFiltradas.map((p) => (
-                <tr key={p.id} className="border-b border-stone-100 last:border-0 hover:bg-stone-100/60 dark:border-zinc-800 dark:hover:bg-white/5">
+                <tr key={p.id} className="border-b border-stone-100 last:border-0 transition-colors duration-100 hover:bg-stone-100/80 dark:border-zinc-800 dark:hover:bg-white/[0.07]">
 
                   {editMode && (
                     <td className="whitespace-nowrap px-4 py-3 text-right">
                       <button
                         onClick={() => abrirEditar(p)}
-                        className="text-sm font-medium text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-teal-400"
+                        className="text-sm font-medium text-zinc-500 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-teal-400"
                       >
                         Editar
                       </button>
@@ -263,8 +269,8 @@ export default function OffboardedPage() {
       )}
 
       {editando && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/40 p-4">
-          <div className="max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-stone-200 bg-white p-4 shadow-lg sm:p-6 dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="modal-backdrop fixed inset-0 flex items-center justify-center bg-black/40 p-4">
+          <div className="modal-content max-h-[85vh] w-full max-w-2xl scroll-smooth overflow-y-auto rounded-2xl border border-stone-200 bg-white p-4 shadow-lg sm:p-6 dark:border-zinc-800 dark:bg-zinc-900">
             <h2 className="mb-4 text-lg font-bold tracking-tight text-zinc-900 dark:text-white">
               {creandoNuevo ? 'Nueva baja' : `Editar: ${editando.name}`}
             </h2>

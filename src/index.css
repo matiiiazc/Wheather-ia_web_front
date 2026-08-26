@@ -76,10 +76,88 @@
 /* ─────────────────────────────────────────
    Base reset
 ───────────────────────────────────────── */
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   margin: 0;
   background-color: var(--color-bg);
   color: var(--color-text-body);
+}
+
+/* ─────────────────────────────────────────
+   Interactive hover/transition utilities
+───────────────────────────────────────── */
+.hover-lift {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.hover-lift:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.hover-scale {
+  transition: transform 0.15s ease;
+}
+.hover-scale:hover {
+  transform: scale(1.02);
+}
+
+.btn-primary {
+  transition: background-color 0.15s, transform 0.1s, box-shadow 0.15s;
+}
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+}
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+/* ─────────────────────────────────────────
+   Page transition animation
+───────────────────────────────────────── */
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-transition {
+  animation: page-enter 0.2s ease-out;
+}
+
+/* ─────────────────────────────────────────
+   Modal transition animation
+───────────────────────────────────────── */
+@keyframes modal-backdrop-enter {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes modal-content-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.modal-backdrop {
+  animation: modal-backdrop-enter 0.15s ease-out;
+}
+
+.modal-content {
+  animation: modal-content-enter 0.2s ease-out;
 }
 
 /* ─────────────────────────────────────────

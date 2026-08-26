@@ -118,7 +118,7 @@ export default function FilterBar({
       {hasActiveFilters && (
         <button
           onClick={onClear}
-          className="flex items-center gap-1.5 self-end rounded-lg border border-stone-200 bg-white px-3 py-2 text-xs font-medium text-zinc-500 transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-600 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:border-red-500/30 dark:hover:bg-red-500/10 dark:hover:text-red-300"
+          className="flex items-center gap-1.5 self-end rounded-lg border border-stone-200 bg-white px-3 py-2 text-xs font-medium text-zinc-500 transition-all duration-150 hover:border-red-200 hover:bg-red-50 hover:text-red-600 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:border-red-500/30 dark:hover:bg-red-500/10 dark:hover:text-red-300"
         >
           <X size={13} />
           Clear

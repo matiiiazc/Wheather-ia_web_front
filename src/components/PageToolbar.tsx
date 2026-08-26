@@ -61,7 +61,7 @@ export default function PageToolbar({
 
         <button
           onClick={onPrimaryClick}
-          className="flex items-center gap-1.5 rounded-xl bg-zinc-900 px-3.5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-zinc-700 sm:px-4 dark:bg-teal-500 dark:text-zinc-950 dark:hover:bg-teal-400"
+          className="flex items-center gap-1.5 rounded-xl bg-zinc-900 px-3.5 py-2.5 text-sm font-medium text-white transition-all duration-150 hover:bg-zinc-700 hover:scale-[1.02] hover:shadow-md sm:px-4 dark:bg-teal-500 dark:text-zinc-950 dark:hover:bg-teal-400"
         >
           <Plus size={16} />
           <span className="hidden sm:inline">{primaryLabel}</span>

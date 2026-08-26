@@ -1,10 +1,11 @@
-import { useState, useEffect, type FormEvent } from 'react';
+import { useState, useEffect, useMemo, type FormEvent } from 'react';
 import { apiFetch } from '../utils/api';
 import FileField from './FileField';
 import PageToolbar from './PageToolbar';
 import FilterBar from './FilterBar';
 import InlineStatusSelect from './InlineStatusSelect';
 import DocumentLink from './DocumentLink';
+import { useToast } from './Toast';
 
 const HIRED_STATUS_OPTIONS = ['Active', 'Contract Ended'];
 
@@ -127,6 +128,7 @@ const CAMPOS_ARCHIVOS: { key: keyof Persona; label: string }[] = [
 ];
 
 export default function HiredPage() {
+  const { toast } = useToast();
   const [personas, setPersonas] = useState<Persona[]>([]);
   const [busqueda, setBusqueda] = useState('');
   const [filterOpen, setFilterOpen] = useState(false);
@@ -141,8 +143,7 @@ export default function HiredPage() {
 
   const hasActiveFilters = !!filterStatus || !!filterDateFrom || !!filterDateTo;
 
-  const personasFiltradas = personas.filter((p) => {
-    // text search
+  const personasFiltradas = useMemo(() => personas.filter((p) => {
     if (busqueda.trim()) {
       const texto = busqueda.toLowerCase();
       const matchText = TODAS_LAS_COLUMNAS.some(({ key }) =>
@@ -150,9 +151,7 @@ export default function HiredPage() {
       );
       if (!matchText) return false;
     }
-    // status filter
     if (filterStatus && p.status !== filterStatus) return false;
-    // date range on startingDate
     if (filterDateFrom || filterDateTo) {
       const d = p.startingDate ? p.startingDate.slice(0, 10) : null;
       if (!d) return false;
@@ -160,7 +159,7 @@ export default function HiredPage() {
       if (filterDateTo && d > filterDateTo) return false;
     }
     return true;
-  });
+  }), [personas, busqueda, filterStatus, filterDateFrom, filterDateTo]);
 
   const personaVacia: Persona = {
     id: '', name: '', country: null, resume: null, fechaIngreso: null, status: null,
@@ -204,25 +203,34 @@ export default function HiredPage() {
           method: 'POST',
           body: JSON.stringify(editando),
         });
+        toast('Hire created successfully');
       } else {
         await apiFetch(`/hired/${editando.id}`, {
           method: 'PUT',
           body: JSON.stringify(editando),
         });
+        toast('Hire updated successfully');
       }
       setEditando(null);
       await cargar();
+    } catch (err) {
+      toast(err instanceof Error ? err.message : 'Error saving hire', 'error');
     } finally {
       setGuardando(false);
     }
   }
 
   async function handleStatusChange(personaId: string, newStatus: string) {
-    await apiFetch(`/hired/${personaId}`, {
-      method: 'PUT',
-      body: JSON.stringify({ status: newStatus }),
-    });
-    setPersonas(prev => prev.map(p => p.id === personaId ? { ...p, status: newStatus } : p));
+    try {
+      await apiFetch(`/hired/${personaId}`, {
+        method: 'PUT',
+        body: JSON.stringify({ status: newStatus }),
+      });
+      setPersonas(prev => prev.map(p => p.id === personaId ? { ...p, status: newStatus } : p));
+      toast('Status updated');
+    } catch {
+      toast('Error updating status', 'error');
+    }
   }
 
   const DOCUMENT_FIELDS = ['resume', 'agreement', 'governmentId', 'photoIdVerification', 'passport', 'backgroundCheck', 'taxFormsSigned', 'utilityBill', 'documentationFolder'];
@@ -261,7 +269,7 @@ export default function HiredPage() {
         <p className="text-sm text-zinc-400 dark:text-zinc-500">Loading...</p>
       ) : (
         <div className="overflow-hidden rounded-2xl border border-stone-200 bg-stone-50 dark:border-zinc-800 dark:bg-zinc-900">
-          <div className="max-h-[65vh] overflow-auto">
+          <div className="max-h-[65vh] scroll-smooth overflow-auto">
           <table className="w-full min-w-[600px] text-left text-sm">
             <thead className="sticky top-0 bg-stone-50 dark:bg-zinc-900">
               <tr className="border-b border-stone-200 text-xs font-semibold uppercase tracking-wide text-zinc-400 dark:border-zinc-800 dark:text-zinc-500">
@@ -273,13 +281,13 @@ export default function HiredPage() {
             </thead>
             <tbody>
               {personasFiltradas.map((p) => (
-                <tr key={p.id} className="border-b border-stone-100 last:border-0 hover:bg-stone-100/60 dark:border-zinc-800 dark:hover:bg-white/5">
+                <tr key={p.id} className="border-b border-stone-100 last:border-0 transition-colors duration-100 hover:bg-stone-100/80 dark:border-zinc-800 dark:hover:bg-white/[0.07]">
 
                   {editMode && (
                     <td className="whitespace-nowrap px-4 py-3 text-right">
                       <button
                         onClick={() => abrirEditar(p)}
-                        className="text-sm font-medium text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-teal-400"
+                        className="text-sm font-medium text-zinc-500 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-teal-400"
                       >
                         Editar
                       </button>
@@ -320,8 +328,8 @@ export default function HiredPage() {
       )}
 
       {editando && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/40 p-4">
-          <div className="max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-stone-200 bg-white p-4 shadow-lg sm:p-6 dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="modal-backdrop fixed inset-0 flex items-center justify-center bg-black/40 p-4">
+          <div className="modal-content max-h-[85vh] w-full max-w-2xl scroll-smooth overflow-y-auto rounded-2xl border border-stone-200 bg-white p-4 shadow-lg sm:p-6 dark:border-zinc-800 dark:bg-zinc-900">
             <h2 className="mb-4 text-lg font-bold tracking-tight text-zinc-900 dark:text-white">
               {creandoNuevo ? 'New hire' : `Editar: ${editando.name}`}
             </h2>
