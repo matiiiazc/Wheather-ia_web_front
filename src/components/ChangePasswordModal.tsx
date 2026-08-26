@@ -1,14 +1,15 @@
 import { useState, type FormEvent } from 'react';
-import { Lock } from 'lucide-react';
+import { Lock, X } from 'lucide-react';
 import { apiFetch } from '../utils/api';
 import { useToast } from './Toast';
 
 interface Props {
   obligatory?: boolean;
+  onClose?: () => void;
   onSuccess: () => void;
 }
 
-export default function ChangePasswordModal({ obligatory = false, onSuccess }: Props) {
+export default function ChangePasswordModal({ obligatory = false, onClose, onSuccess }: Props) {
   const { toast } = useToast();
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -48,20 +49,30 @@ export default function ChangePasswordModal({ obligatory = false, onSuccess }: P
   return (
     <div className={`fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4 ${obligatory ? '' : 'modal-backdrop'}`}>
       <div className={`w-full max-w-sm rounded-2xl border border-stone-200 bg-white p-6 shadow-xl dark:border-zinc-800 dark:bg-zinc-900 ${obligatory ? '' : 'modal-content'}`}>
-        <div className="mb-5 flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-500/20">
-            <Lock size={18} className="text-amber-600 dark:text-amber-400" />
+        <div className="mb-5 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-500/20">
+              <Lock size={18} className="text-amber-600 dark:text-amber-400" />
+            </div>
+            <div>
+              <h2 className="text-base font-semibold text-zinc-900 dark:text-white">
+                Cambiar contraseña
+              </h2>
+              <p className="text-xs text-zinc-400 dark:text-zinc-500">
+                {obligatory
+                  ? 'Debés cambiar tu contraseña para continuar'
+                  : 'Actualizá tu contraseña'}
+              </p>
+            </div>
           </div>
-          <div>
-            <h2 className="text-base font-semibold text-zinc-900 dark:text-white">
-              Cambiar contraseña
-            </h2>
-            <p className="text-xs text-zinc-400 dark:text-zinc-500">
-              {obligatory
-                ? 'Debés cambiar tu contraseña para continuar'
-                : 'Actualizá tu contraseña'}
-            </p>
-          </div>
+          {!obligatory && onClose && (
+            <button
+              onClick={onClose}
+              className="flex h-7 w-7 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-600 dark:hover:bg-zinc-700 dark:hover:text-zinc-200"
+            >
+              <X size={16} />
+            </button>
+          )}
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">

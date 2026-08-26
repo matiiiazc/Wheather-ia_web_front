@@ -230,6 +230,7 @@ function App() {
       {(showChangePassword || usuario.mustChangePassword) && (
         <ChangePasswordModal
           obligatory={!!usuario.mustChangePassword}
+          onClose={() => setShowChangePassword(false)}
           onSuccess={handleChangePasswordSuccess}
         />
       )}
