@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { Lock, X } from 'lucide-react';
 import { apiFetch } from '../utils/api';
-import { useToast } from './Toast';
+import { useToast } from './useToast';
 
 interface Props {
   obligatory?: boolean;

@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, type FormEvent } from 'react';
 import { apiFetch } from '../utils/api';
 import PageToolbar from './PageToolbar';
 import FilterBar from './FilterBar';
-import { useToast } from './Toast';
+import { useToast } from './useToast';
 
 const HIRING_MANAGER_OPTIONS = ['PABLO', 'JOSE'];
 
@@ -66,14 +66,13 @@ export default function TestsPage() {
   }), [tests, busqueda, filterManager]);
 
   async function cargar() {
-    setCargando(true);
     const data = await apiFetch('/tests');
     setTests(data);
     setCargando(false);
   }
 
   useEffect(() => {
-    cargar();
+    void Promise.resolve().then(cargar);
   }, []);
 
   function abrirModal() {

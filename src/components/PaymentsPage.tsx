@@ -5,7 +5,7 @@ import PageToolbar from './PageToolbar';
 import FilterBar from './FilterBar';
 import InlineStatusSelect from './InlineStatusSelect';
 import DocumentLink from './DocumentLink';
-import { useToast } from './Toast';
+import { useToast } from './useToast';
 
 interface Contractor {
   id: string;
@@ -109,7 +109,6 @@ export default function PaymentsPage() {
   const [guardandoEdicion, setGuardandoEdicion] = useState(false);
 
   async function cargarTodo() {
-    setCargando(true);
     const [pagosData, contractorsData] = await Promise.all([
       apiFetch('/payments'),
       apiFetch('/contractors'),
@@ -120,18 +119,27 @@ export default function PaymentsPage() {
   }
 
   useEffect(() => {
-    cargarTodo();
+    void Promise.resolve().then(cargarTodo);
   }, []);
 
   useEffect(() => {
-    if (!nuevo.contractorId) {
-      setDatosBancarios(null);
-      return;
+    let activo = true;
+    async function cargarDatosBancarios() {
+      if (!nuevo.contractorId) return;
+      setCargandoBanco(true);
+      try {
+        const data = await apiFetch(`/payments/datos-bancarios/${nuevo.contractorId}`);
+        if (activo) setDatosBancarios(data);
+      } catch {
+        // sin datos bancarios disponibles; se deja el form como está
+      } finally {
+        if (activo) setCargandoBanco(false);
+      }
     }
-    setCargandoBanco(true);
-    apiFetch(`/payments/datos-bancarios/${nuevo.contractorId}`)
-      .then(setDatosBancarios)
-      .finally(() => setCargandoBanco(false));
+    void cargarDatosBancarios();
+    return () => {
+      activo = false;
+    };
   }, [nuevo.contractorId]);
 
   function abrirModal() {
@@ -159,6 +167,7 @@ export default function PaymentsPage() {
       });
       setModalAbierto(false);
       toast('Payment created successfully');
+      setCargando(true);
       await cargarTodo();
     } catch (err) {
       toast(err instanceof Error ? err.message : 'Error creating payment', 'error');
@@ -178,6 +187,7 @@ export default function PaymentsPage() {
       });
       setEditandoPago(null);
       toast('Payment updated successfully');
+      setCargando(true);
       await cargarTodo();
     } catch (err) {
       toast(err instanceof Error ? err.message : 'Error updating payment', 'error');

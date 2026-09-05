@@ -5,7 +5,7 @@ import PageToolbar from './PageToolbar';
 import FilterBar from './FilterBar';
 import InlineStatusSelect from './InlineStatusSelect';
 import DocumentLink from './DocumentLink';
-import { useToast } from './Toast';
+import { useToast } from './useToast';
 
 const HIRED_STATUS_OPTIONS = ['Active', 'Contract Ended'];
 
@@ -173,14 +173,13 @@ export default function HiredPage() {
   };
 
   async function cargar() {
-    setCargando(true);
     const data = await apiFetch('/hired');
     setPersonas(data);
     setCargando(false);
   }
 
   useEffect(() => {
-    cargar();
+    void Promise.resolve().then(cargar);
   }, []);
 
   function abrirNuevo() {

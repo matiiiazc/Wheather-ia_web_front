@@ -1,19 +1,6 @@
-import { useState, useEffect, useCallback, createContext, useContext, type ReactNode } from 'react';
+import { useState, useEffect, useCallback, type ReactNode } from 'react';
 import { CheckCircle, XCircle, AlertTriangle, X } from 'lucide-react';
-
-type ToastType = 'success' | 'error' | 'warning';
-
-interface Toast {
-  id: number;
-  message: string;
-  type: ToastType;
-}
-
-interface ToastContextValue {
-  toast: (message: string, type?: ToastType) => void;
-}
-
-const ToastContext = createContext<ToastContextValue | null>(null);
+import { ToastContext, type Toast, type ToastType } from './useToast';
 
 let toastId = 0;
 
@@ -42,12 +29,6 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       </div>
     </ToastContext.Provider>
   );
-}
-
-export function useToast() {
-  const ctx = useContext(ToastContext);
-  if (!ctx) throw new Error('useToast must be used within ToastProvider');
-  return ctx;
 }
 
 const ICONS: Record<ToastType, typeof CheckCircle> = {

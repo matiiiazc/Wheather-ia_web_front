@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, type FormEvent } from 'react';
 import { apiFetch } from '../utils/api';
 import PageToolbar from './PageToolbar';
 import FilterBar from './FilterBar';
-import { useToast } from './Toast';
+import { useToast } from './useToast';
 
 const OFFBOARDED_STATUS_OPTIONS = ['Active', 'Contract Ended'];
 const COUNTRY_OPTIONS = ['Argentina', 'Spain', 'Brazil', 'Colombia', 'Chile', 'Peru', 'Mexico', 'Other'];
@@ -138,14 +138,13 @@ export default function OffboardedPage() {
   };
 
   async function cargar() {
-    setCargando(true);
     const data = await apiFetch('/offboarded');
     setPersonas(data);
     setCargando(false);
   }
 
   useEffect(() => {
-    cargar();
+    void Promise.resolve().then(cargar);
   }, []);
 
   function abrirNuevo() {

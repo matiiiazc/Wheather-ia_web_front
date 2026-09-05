@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, type FormEvent } from 'react';
 import { apiFetch } from '../utils/api';
 import PageToolbar from './PageToolbar';
 import FilterBar from './FilterBar';
-import { useToast } from './Toast';
+import { useToast } from './useToast';
 
 interface Contractor {
   id: string;
@@ -76,7 +76,6 @@ export default function AbsencePage() {
   const [guardandoEdicion, setGuardandoEdicion] = useState(false);
 
   async function cargarTodo() {
-    setCargando(true);
     const [ausenciasData, contractorsData] = await Promise.all([
       apiFetch('/absences'),
       apiFetch('/contractors'),
@@ -87,7 +86,7 @@ export default function AbsencePage() {
   }
 
   useEffect(() => {
-    cargarTodo();
+    void Promise.resolve().then(cargarTodo);
   }, []);
 
   function abrirModal() {
@@ -106,6 +105,7 @@ export default function AbsencePage() {
       });
       setModalAbierto(false);
       toast('Absence created successfully');
+      setCargando(true);
       await cargarTodo();
     } catch (err) {
       toast(err instanceof Error ? err.message : 'Error creating absence', 'error');
@@ -125,6 +125,7 @@ export default function AbsencePage() {
       });
       setEditando(null);
       toast('Absence updated successfully');
+      setCargando(true);
       await cargarTodo();
     } catch (err) {
       toast(err instanceof Error ? err.message : 'Error updating absence', 'error');

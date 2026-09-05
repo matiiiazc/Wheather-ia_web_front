@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, type FormEvent } from 'react';
 import { apiFetch } from '../utils/api';
 import PageToolbar from './PageToolbar';
 import FilterBar from './FilterBar';
-import { useToast } from './Toast';
+import { useToast } from './useToast';
 
 const CURRENCY_OPTIONS = ['USD', 'EUR', 'ARS', 'GBP', 'BRL'];
 
@@ -69,14 +69,13 @@ export default function ContractorsPage() {
   const [guardando, setGuardando] = useState(false);
 
   async function cargarContractors() {
-    setCargando(true);
     const data = await apiFetch('/contractors');
     setContractors(data);
     setCargando(false);
   }
 
   useEffect(() => {
-    cargarContractors();
+    void Promise.resolve().then(cargarContractors);
   }, []);
 
   function abrirNuevo() {

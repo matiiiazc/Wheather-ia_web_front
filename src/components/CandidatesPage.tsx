@@ -6,7 +6,7 @@ import PageToolbar from './PageToolbar';
 import FilterBar from './FilterBar';
 import InlineStatusSelect from './InlineStatusSelect';
 import DocumentLink from './DocumentLink';
-import { useToast } from './Toast';
+import { useToast } from './useToast';
 
 const STAGES_OPTIONS = [
   'Invite candidate to Interview',
@@ -131,14 +131,13 @@ export default function CandidatesPage() {
   }), [candidatos, busqueda, filterStage, filterDateFrom, filterDateTo]);
 
   async function cargar() {
-    setCargando(true);
     const data = await apiFetch('/candidates');
     setCandidatos(data);
     setCargando(false);
   }
 
   useEffect(() => {
-    cargar();
+    void Promise.resolve().then(cargar);
   }, []);
 
   function abrirNuevo() {
