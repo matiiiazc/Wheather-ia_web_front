@@ -16,7 +16,14 @@ import {
 } from 'lucide-react';
 import Login from './components/login';
 import ChangePasswordModal from './components/ChangePasswordModal';
-import { guardarSesion, leerSesion, limpiarSesion } from './utils/session';
+import { API_URL } from './utils/api';
+import {
+  guardarSesion,
+  setToken,
+  actualizarUsuario,
+  leerUsuario,
+  limpiarSesion,
+} from './utils/session';
 import type { UsuarioLogueado } from './utils/session';
 
 const ContractorsPage = lazy(() => import('./components/ContractorsPage'));
@@ -41,7 +48,7 @@ function useDarkMode() {
 }
 
 function App() {
-  const [usuario, setUsuario] = useState<UsuarioLogueado | null>(null);
+  const [usuario, setUsuario] = useState<UsuarioLogueado | null>(() => leerUsuario());
   const [cargando, setCargando] = useState(true);
   const [vista, setVista] = useState<Vista>('contractors');
   const { dark, toggle: toggleDark } = useDarkMode();
@@ -49,15 +56,34 @@ function App() {
   const [showChangePassword, setShowChangePassword] = useState(false);
 
   useEffect(() => {
-    const sesion = leerSesion();
-    if (sesion) {
-      setUsuario(sesion.user);
+    // La sesión real está en la cookie HttpOnly; al recargar la página la
+    // validamos contra el backend (que además nos re-emite el token en
+    // memoria para poder firmar URLs de archivos).
+    async function validarSesion() {
+      try {
+        const res = await fetch(`${API_URL}/auth/me`, { credentials: 'include' });
+        if (res.ok) {
+          const data = await res.json();
+          setToken(data.token);
+          setUsuario(data.user);
+        } else {
+          limpiarSesion();
+          setUsuario(null);
+        }
+      } catch {
+        limpiarSesion();
+        setUsuario(null);
+      } finally {
+        setCargando(false);
+      }
     }
-    setCargando(false);
+
+    validarSesion();
   }, []);
 
   const handleLoginSuccess = (data: { token: string; user: UsuarioLogueado }) => {
     guardarSesion(data.token, data.user);
+    setToken(data.token);
     setUsuario(data.user);
     if (data.user.mustChangePassword) {
       setShowChangePassword(true);
@@ -67,15 +93,20 @@ function App() {
   const handleChangePasswordSuccess = () => {
     if (usuario) {
       const updated = { ...usuario, mustChangePassword: false };
-      guardarSesion(leerSesion()!.token, updated);
+      actualizarUsuario(updated);
       setUsuario(updated);
     }
     setShowChangePassword(false);
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     limpiarSesion();
     setUsuario(null);
+    try {
+      await fetch(`${API_URL}/auth/logout`, { method: 'POST', credentials: 'include' });
+    } catch {
+      // aunque falle el logout en el server, ya borramos la sesión local
+    }
   };
 
   const navegar = useCallback((v: Vista) => {

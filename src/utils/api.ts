@@ -1,21 +1,22 @@
-import { leerSesion, limpiarSesion } from './session';
+import { getToken, limpiarSesion } from './session';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
 /**
- * Wrapper de fetch que agrega el header Authorization con el token
- * guardado, para no repetirlo a mano en cada llamada. Si el backend
- * responde 401 (token vencido/inválido), limpia la sesión local —
- * el próximo render de App.tsx va a mandar de vuelta al login.
+ * Wrapper de fetch que envía las credenciales (cookie HttpOnly) y agrega el
+ * header Authorization con el token en memoria cuando está disponible. Si el
+ * backend responde 401, limpia la sesión local — el próximo render de App.tsx
+ * va a mandar de vuelta al login.
  */
 export async function apiFetch(path: string, options: RequestInit = {}) {
-  const sesion = leerSesion();
+  const token = getToken();
 
   const response = await fetch(`${API_URL}${path}`, {
     ...options,
+    credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
-      ...(sesion ? { Authorization: `Bearer ${sesion.token}` } : {}),
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...options.headers,
     },
   });
@@ -40,12 +41,13 @@ export async function apiFetch(path: string, options: RequestInit = {}) {
  * poner su propio Content-Type con el "boundary" del multipart.
  */
 export async function apiFetchRaw(path: string, options: RequestInit = {}) {
-  const sesion = leerSesion();
+  const token = getToken();
 
   const response = await fetch(`${API_URL}${path}`, {
     ...options,
+    credentials: 'include',
     headers: {
-      ...(sesion ? { Authorization: `Bearer ${sesion.token}` } : {}),
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...options.headers,
     },
   });

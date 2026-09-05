@@ -1,50 +1,38 @@
 export interface UsuarioLogueado {
   id: string;
   nombre: string;
-  rol: 'admin' | 'rrhh' | 'empleado';
+  rol: string;
   mustChangePassword?: boolean;
 }
 
-interface SesionGuardada {
-  token: string;
-  user: UsuarioLogueado;
-  expiraEn: number; // timestamp en milisegundos
+const STORAGE_KEY = 'nexo_rrhh_usuario';
+
+// El token vive SOLO en memoria (en la cookie HttpOnly es donde se guarda la
+// sesión real). No se persiste en localStorage: así un XSS no puede robarlo.
+let tokenMemoria: string | null = null;
+
+export function setToken(token: string | null): void {
+  tokenMemoria = token;
 }
 
-const STORAGE_KEY = 'nexo_rrhh_sesion';
-const DURACION_MS = 12 * 60 * 60 * 1000; // 12 horas
+export function getToken(): string | null {
+  return tokenMemoria;
+}
 
-/**
- * Guarda la sesión en localStorage junto con el momento en que
- * debe considerarse vencida (ahora + 12h), independientemente
- * de si el navegador se cierra o no en el medio.
- */
 export function guardarSesion(token: string, user: UsuarioLogueado): void {
-  const sesion: SesionGuardada = {
-    token,
-    user,
-    expiraEn: Date.now() + DURACION_MS,
-  };
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(sesion));
+  tokenMemoria = token;
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
 }
 
-/**
- * Lee la sesión guardada. Si no existe, está corrupta, o ya pasó
- * la fecha de expiración, la borra y devuelve null.
- */
-export function leerSesion(): { token: string; user: UsuarioLogueado } | null {
+export function actualizarUsuario(user: UsuarioLogueado): void {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
+}
+
+export function leerUsuario(): UsuarioLogueado | null {
   const raw = localStorage.getItem(STORAGE_KEY);
   if (!raw) return null;
-
   try {
-    const sesion: SesionGuardada = JSON.parse(raw);
-
-    if (Date.now() > sesion.expiraEn) {
-      limpiarSesion();
-      return null;
-    }
-
-    return { token: sesion.token, user: sesion.user };
+    return JSON.parse(raw);
   } catch {
     limpiarSesion();
     return null;
@@ -52,5 +40,6 @@ export function leerSesion(): { token: string; user: UsuarioLogueado } | null {
 }
 
 export function limpiarSesion(): void {
+  tokenMemoria = null;
   localStorage.removeItem(STORAGE_KEY);
 }
