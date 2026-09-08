@@ -22,12 +22,12 @@ export default function ChangePasswordModal({ obligatory = false, onClose, onSuc
     setError('');
 
     if (newPassword.length < 6) {
-      setError('La nueva contraseña debe tener al menos 6 caracteres');
+      setError('The new password must be at least 6 characters long');
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      setError('Las contraseñas no coinciden');
+      setError('Passwords do not match');
       return;
     }
 
@@ -37,10 +37,10 @@ export default function ChangePasswordModal({ obligatory = false, onClose, onSuc
         method: 'POST',
         body: JSON.stringify({ currentPassword, newPassword }),
       });
-      toast('Contraseña actualizada correctamente');
+      toast('Password updated successfully');
       onSuccess();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al cambiar contraseña');
+      setError(err instanceof Error ? err.message : 'Error changing password');
     } finally {
       setLoading(false);
     }
@@ -56,12 +56,12 @@ export default function ChangePasswordModal({ obligatory = false, onClose, onSuc
             </div>
             <div>
               <h2 className="text-base font-semibold text-zinc-900 dark:text-white">
-                Cambiar contraseña
+                Change password
               </h2>
               <p className="text-xs text-zinc-400 dark:text-zinc-500">
                 {obligatory
-                  ? 'Debés cambiar tu contraseña para continuar'
-                  : 'Actualizá tu contraseña'}
+                  ? 'You must change your password to continue'
+                  : 'Update your password'}
               </p>
             </div>
           </div>
@@ -78,7 +78,7 @@ export default function ChangePasswordModal({ obligatory = false, onClose, onSuc
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
           <div>
             <label className="mb-1 block text-sm font-medium text-zinc-500 dark:text-zinc-400">
-              Contraseña actual
+              Current password
             </label>
             <input
               type="password"
@@ -91,7 +91,7 @@ export default function ChangePasswordModal({ obligatory = false, onClose, onSuc
 
           <div>
             <label className="mb-1 block text-sm font-medium text-zinc-500 dark:text-zinc-400">
-              Nueva contraseña
+              New password
             </label>
             <input
               type="password"
@@ -105,7 +105,7 @@ export default function ChangePasswordModal({ obligatory = false, onClose, onSuc
 
           <div>
             <label className="mb-1 block text-sm font-medium text-zinc-500 dark:text-zinc-400">
-              Confirmar nueva contraseña
+              Confirm new password
             </label>
             <input
               type="password"
@@ -128,7 +128,7 @@ export default function ChangePasswordModal({ obligatory = false, onClose, onSuc
             disabled={loading}
             className="mt-1 rounded-full bg-zinc-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-teal-500 dark:text-zinc-950 dark:hover:bg-teal-400"
           >
-            {loading ? 'Guardando...' : 'Guardar nueva contraseña'}
+            {loading ? 'Saving...' : 'Save new password'}
           </button>
         </form>
       </div>

@@ -43,7 +43,7 @@ interface Payment {
   sentDate: string | null;
 }
 
-const ESTADOS = ['Pendiente', 'Procesando', 'Pagado', 'Rechazado'];
+const ESTADOS = ['Pending', 'Processing', 'Paid', 'Rejected'];
 
 function aInputDate(iso: string | null | undefined): string {
   if (!iso) return '';
@@ -61,7 +61,7 @@ const pagoVacio = {
   invoice: '',
   invoiceAmount: '',
   paymentConfirmation: '',
-  status: 'Pendiente',
+  status: 'Pending',
   receiptSent: false,
   sentDate: '',
 };
@@ -208,7 +208,7 @@ export default function PaymentsPage() {
         body: JSON.stringify({ status: newStatus }),
       });
       
-      if (newStatus === 'Pagado' && oldStatus !== 'Pagado') {
+      if (newStatus === 'Paid' && oldStatus !== 'Paid') {
         await apiFetch(`/payments/${paymentId}/send-receipt`, {
           method: 'POST',
         });
@@ -222,10 +222,10 @@ export default function PaymentsPage() {
   }
 
   const colorEstado: Record<string, string> = {
-    Pendiente: 'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400',
-    Procesando: 'bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400',
-    Pagado: 'bg-green-50 text-green-700 dark:bg-green-500/10 dark:text-green-400',
-    Rechazado: 'bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-400',
+    Pending: 'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400',
+    Processing: 'bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400',
+    Paid: 'bg-green-50 text-green-700 dark:bg-green-500/10 dark:text-green-400',
+    Rejected: 'bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-400',
   };
 
   const inputClass =
@@ -271,7 +271,7 @@ export default function PaymentsPage() {
             <thead className="sticky top-0 bg-stone-50 dark:bg-zinc-900">
               <tr className="border-b border-stone-200 text-xs font-semibold uppercase tracking-wide text-zinc-400 dark:border-zinc-800 dark:text-zinc-500">
 
-                {editMode && <th className="whitespace-nowrap px-4 py-3 text-right font-medium">Acción</th>}
+                {editMode && <th className="whitespace-nowrap px-4 py-3 text-right font-medium">Action</th>}
                 <th className="whitespace-nowrap px-4 py-3 font-medium">Date of payment</th>
                 <th className="whitespace-nowrap px-4 py-3 font-medium">Contractor</th>
                 <th className="whitespace-nowrap px-4 py-3 font-medium">Service</th>
@@ -295,7 +295,7 @@ export default function PaymentsPage() {
                         onClick={() => setEditandoPago(p)}
                         className="text-sm font-medium text-zinc-500 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-teal-400"
                       >
-                        Editar
+                        Edit
                       </button>
                     </td>
                   )}
@@ -310,11 +310,11 @@ export default function PaymentsPage() {
                     {p.invoiceDate ? p.invoiceDate.slice(0, 10) : '—'}
                   </td>
                   <td className="whitespace-nowrap px-4 py-3">
-                    <DocumentLink url={p.invoice} label="Ver factura" />
+                    <DocumentLink url={p.invoice} label="View invoice" />
                   </td>
                   <td className="whitespace-nowrap px-4 py-3 text-zinc-400 dark:text-zinc-500">${p.invoiceAmount}</td>
                   <td className="whitespace-nowrap px-4 py-3">
-                    <DocumentLink url={p.paymentConfirmation} label="Ver comprobante" />
+                    <DocumentLink url={p.paymentConfirmation} label="View receipt" />
                   </td>
                   <td className="whitespace-nowrap px-4 py-3">
                     <InlineStatusSelect
@@ -325,7 +325,7 @@ export default function PaymentsPage() {
                     />
                   </td>
                   <td className="whitespace-nowrap px-4 py-3 text-zinc-400 dark:text-zinc-500">
-                    {p.receiptSent ? 'Sí' : 'No'}
+                    {p.receiptSent ? 'Yes' : 'No'}
                   </td>
                   <td className="whitespace-nowrap px-4 py-3 text-zinc-400 dark:text-zinc-500">
                     {p.sentDate ? p.sentDate.slice(0, 10) : '—'}
@@ -340,7 +340,7 @@ export default function PaymentsPage() {
       {modalAbierto && (
         <div className="modal-backdrop fixed inset-0 flex items-center justify-center bg-black/40 p-4">
           <div className="modal-content max-h-[85vh] w-full max-w-md scroll-smooth overflow-y-auto rounded-2xl border border-stone-200 bg-white p-4 shadow-lg sm:p-6 dark:border-zinc-800 dark:bg-zinc-900">
-            <h2 className="mb-4 text-lg font-bold tracking-tight text-zinc-900 dark:text-white">Nuevo pago</h2>
+            <h2 className="mb-4 text-lg font-bold tracking-tight text-zinc-900 dark:text-white">New payment</h2>
 
             <form onSubmit={handleGuardar} className="flex flex-col gap-3">
               <div>
@@ -366,10 +366,10 @@ export default function PaymentsPage() {
               {datosBancarios && (
                 <div className="rounded-lg border border-blue-100 bg-blue-50 p-3 text-xs text-gray-700 dark:border-blue-500/20 dark:bg-blue-500/10 dark:text-gray-300">
                   <p className="mb-1 font-medium text-blue-900 dark:text-blue-300">Paying to this account:</p>
-                  <p>Banco: {datosBancarios.bankName || '—'}</p>
-                  <p>Cuenta / IBAN: {datosBancarios.accountNumberIban || '—'}</p>
+                  <p>Bank: {datosBancarios.bankName || '—'}</p>
+                  <p>Account / IBAN: {datosBancarios.accountNumberIban || '—'}</p>
                   <p>SWIFT: {datosBancarios.swift || '—'}</p>
-                  <p>Moneda: {datosBancarios.currency || '—'}</p>
+                  <p>Currency: {datosBancarios.currency || '—'}</p>
                 </div>
               )}
 
@@ -424,7 +424,7 @@ export default function PaymentsPage() {
               </div>
 
               <FileField
-                label="Invoice (archivo)"
+                label="Invoice (file)"
                 value={nuevo.invoice}
                 onChange={(url) => setNuevo({ ...nuevo, invoice: url })}
               />
@@ -441,7 +441,7 @@ export default function PaymentsPage() {
               </div>
 
               <FileField
-                label="Payment Confirmation (comprobante)"
+                label="Payment Confirmation (receipt)"
                 value={nuevo.paymentConfirmation}
                 onChange={(url) => setNuevo({ ...nuevo, paymentConfirmation: url })}
               />
@@ -484,14 +484,14 @@ export default function PaymentsPage() {
                   onClick={() => setModalAbierto(false)}
                   className="rounded-lg px-4 py-2 text-sm font-medium text-zinc-500 hover:bg-stone-100 dark:text-zinc-400 dark:hover:bg-white/5"
                 >
-                  Cancelar
+                  Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={guardando || !nuevo.contractorId}
                   className="rounded-full bg-zinc-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-700 dark:bg-teal-500 dark:text-zinc-950 dark:hover:bg-teal-400 disabled:opacity-60"
                 >
-                  {guardando ? 'Saving...' : 'Registrar pago'}
+                  {guardando ? 'Saving...' : 'Register payment'}
                 </button>
               </div>
             </form>
@@ -558,7 +558,7 @@ export default function PaymentsPage() {
               </div>
 
               <FileField
-                label="Invoice (archivo)"
+                label="Invoice (file)"
                 value={editandoPago.invoice ?? ''}
                 onChange={(url) => setEditandoPago({ ...editandoPago, invoice: url })}
               />
@@ -574,7 +574,7 @@ export default function PaymentsPage() {
               </div>
 
               <FileField
-                label="Payment Confirmation (comprobante)"
+                label="Payment Confirmation (receipt)"
                 value={editandoPago.paymentConfirmation ?? ''}
                 onChange={(url) => setEditandoPago({ ...editandoPago, paymentConfirmation: url })}
               />
@@ -617,7 +617,7 @@ export default function PaymentsPage() {
                   onClick={() => setEditandoPago(null)}
                   className="rounded-lg px-4 py-2 text-sm font-medium text-zinc-500 hover:bg-stone-100 dark:text-zinc-400 dark:hover:bg-white/5"
                 >
-                  Cancelar
+                  Cancel
                 </button>
                 <button
                   type="submit"

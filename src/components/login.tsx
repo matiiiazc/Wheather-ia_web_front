@@ -31,13 +31,13 @@ export default function Login({ onLoginSuccess }: LoginProps) {
 
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.error || 'Email o contraseña incorrectos');
+        throw new Error(data.error || 'Incorrect email or password');
       }
 
       const data: LoginResponse = await response.json();
       onLoginSuccess(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al iniciar sesión');
+      setError(err instanceof Error ? err.message : 'Error signing in');
     } finally {
       setLoading(false);
     }
@@ -63,10 +63,10 @@ export default function Login({ onLoginSuccess }: LoginProps) {
 
           <div className="mb-6 text-center">
             <h1 className="mt-1 text-xl font-semibold text-zinc-900 dark:text-white">
-              Iniciar sesión
+              Sign in
             </h1>
             <p className="mt-1 text-sm text-zinc-400 dark:text-zinc-500">
-              Ingresá con tu cuenta para continuar
+              Enter your account to continue
             </p>
           </div>
 
@@ -84,7 +84,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                placeholder="nombre@empresa.com"
+                placeholder="name@company.com"
                 className="w-full rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm text-zinc-900 outline-none transition focus:border-zinc-400 focus:ring-1 focus:ring-zinc-300 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white dark:focus:border-teal-500 dark:focus:ring-teal-500/30"
               />
             </div>
@@ -94,7 +94,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
                 htmlFor="password"
                 className="mb-1 block text-sm font-medium text-zinc-500 dark:text-zinc-400"
               >
-                Contraseña
+                Password
               </label>
               <input
                 id="password"
@@ -118,7 +118,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
               disabled={loading}
               className="mt-2 rounded-full bg-zinc-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-teal-500 dark:text-zinc-950 dark:hover:bg-teal-400"
             >
-              {loading ? 'Ingresando...' : 'Ingresar'}
+              {loading ? 'Signing in...' : 'Sign in'}
             </button>
           </form>
         </div>

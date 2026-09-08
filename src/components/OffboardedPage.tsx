@@ -80,7 +80,7 @@ const CAMPOS_PERSONALES: { key: keyof Persona; label: string }[] = [
 const CAMPOS_GENERALES: { key: keyof Persona; label: string }[] = [
   { key: 'status', label: 'Status' },
   { key: 'emailAddress', label: 'Email' },
-  { key: 'phone', label: 'Teléfono' },
+  { key: 'phone', label: 'Phone' },
 ];
 
 const CAMPOS_BANCO: { key: keyof Persona; label: string }[] = [
@@ -222,7 +222,7 @@ export default function OffboardedPage() {
             <thead className="sticky top-0 bg-stone-50 dark:bg-zinc-900">
               <tr className="border-b border-stone-200 text-xs font-semibold uppercase tracking-wide text-zinc-400 dark:border-zinc-800 dark:text-zinc-500">
 
-                {editMode && <th className="whitespace-nowrap px-4 py-3 text-right font-medium">Acción</th>}
+                {editMode && <th className="whitespace-nowrap px-4 py-3 text-right font-medium">Action</th>}
                 {TODAS_LAS_COLUMNAS.map(({ key, label }) => (
                   <th key={key} className="whitespace-nowrap px-4 py-3 font-medium">{label}</th>
                 ))}              </tr>
@@ -237,7 +237,7 @@ export default function OffboardedPage() {
                         onClick={() => abrirEditar(p)}
                         className="text-sm font-medium text-zinc-500 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-teal-400"
                       >
-                        Editar
+                        Edit
                       </button>
                     </td>
                   )}
@@ -271,12 +271,12 @@ export default function OffboardedPage() {
         <div className="modal-backdrop fixed inset-0 flex items-center justify-center bg-black/40 p-4">
           <div className="modal-content max-h-[85vh] w-full max-w-2xl scroll-smooth overflow-y-auto rounded-2xl border border-stone-200 bg-white p-4 shadow-lg sm:p-6 dark:border-zinc-800 dark:bg-zinc-900">
             <h2 className="mb-4 text-lg font-bold tracking-tight text-zinc-900 dark:text-white">
-              {creandoNuevo ? 'Nueva baja' : `Editar: ${editando.name}`}
+              {creandoNuevo ? 'New offboarding' : `Edit: ${editando.name}`}
             </h2>
 
             <form onSubmit={handleGuardar} className="flex flex-col gap-5">
               <div>
-                <label className="mb-1 block text-xs font-medium text-zinc-500 dark:text-zinc-400">Nombre completo</label>
+                <label className="mb-1 block text-xs font-medium text-zinc-500 dark:text-zinc-400">Full name</label>
                 <input
                   type="text"
                   value={editando.name}
@@ -368,7 +368,7 @@ export default function OffboardedPage() {
                   onClick={() => setEditando(null)}
                   className="rounded-lg px-4 py-2 text-sm font-medium text-zinc-500 hover:bg-stone-100 dark:text-zinc-400 dark:hover:bg-white/5"
                 >
-                  Cancelar
+                  Cancel
                 </button>
                 <button
                   type="submit"

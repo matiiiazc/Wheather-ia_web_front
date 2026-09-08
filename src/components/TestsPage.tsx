@@ -161,7 +161,7 @@ export default function TestsPage() {
                   {editMode && (
                     <td className="whitespace-nowrap px-4 py-3 text-right">
                       <button onClick={() => setEditando(t)}                       className="text-sm font-medium text-zinc-500 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-teal-400">
-                        Editar
+                        Edit
                       </button>
                     </td>
                   )}

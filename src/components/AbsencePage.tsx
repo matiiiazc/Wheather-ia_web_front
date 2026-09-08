@@ -190,7 +190,7 @@ export default function AbsencePage() {
                         onClick={() => setEditando(a)}
                         className="text-sm font-medium text-zinc-500 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-teal-400"
                       >
-                        Editar
+                        Edit
                       </button>
                     </td>
                   )}
@@ -280,7 +280,7 @@ export default function AbsencePage() {
 
               <div className="mt-4 flex justify-end gap-2">
                 <button type="button" onClick={() => setModalAbierto(false)} className="rounded-lg px-4 py-2 text-sm font-medium text-zinc-500 hover:bg-stone-100 dark:text-zinc-400 dark:hover:bg-white/5">
-                  Cancelar
+                  Cancel
                 </button>
                 <button type="submit" disabled={guardando} className="rounded-full bg-zinc-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-700 dark:bg-teal-500 dark:text-zinc-950 dark:hover:bg-teal-400 disabled:opacity-60">
                   {guardando ? 'Saving...' : 'Save'}
@@ -334,7 +334,7 @@ export default function AbsencePage() {
 
               <div className="mt-4 flex justify-end gap-2">
                 <button type="button" onClick={() => setEditando(null)} className="rounded-lg px-4 py-2 text-sm font-medium text-zinc-500 hover:bg-stone-100 dark:text-zinc-400 dark:hover:bg-white/5">
-                  Cancelar
+                  Cancel
                 </button>
                 <button type="submit" disabled={guardandoEdicion} className="rounded-full bg-zinc-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-700 dark:bg-teal-500 dark:text-zinc-950 dark:hover:bg-teal-400 disabled:opacity-60">
                   {guardandoEdicion ? 'Saving...' : 'Save'}

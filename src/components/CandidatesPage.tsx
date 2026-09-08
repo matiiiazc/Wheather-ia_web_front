@@ -53,7 +53,7 @@ const TODAS_LAS_COLUMNAS: { key: keyof Candidato; label: string }[] = [
   { key: 'resume', label: 'Resume' },
   { key: 'education', label: 'Education' },
   { key: 'country', label: 'Country' },
-  { key: 'continente', label: 'Continente' },
+  { key: 'continente', label: 'Continent' },
   { key: 'salary', label: 'Salary' },
   { key: 'notes', label: 'Notes' },
   { key: 'stages', label: 'Stages' },
@@ -61,7 +61,7 @@ const TODAS_LAS_COLUMNAS: { key: keyof Candidato; label: string }[] = [
   { key: 'results', label: 'Results' },
   { key: 'clientFeedback', label: 'Client Feedback' },
   { key: 'hiringManager', label: 'Hiring Manager' },
-  { key: 'fechaContratacion', label: 'Fecha de contratacion' },
+  { key: 'fechaContratacion', label: 'Hiring Date' },
   { key: 'mail', label: 'Mail' },
   { key: 'emailSent', label: 'Email Sent' },
 ];
@@ -72,7 +72,7 @@ const CAMPOS_GENERALES: { key: keyof Candidato; label: string }[] = [
   { key: 'profileVerified', label: 'Profile Verified' },
   { key: 'education', label: 'Education' },
   { key: 'country', label: 'Country' },
-  { key: 'continente', label: 'Continente' },
+  { key: 'continente', label: 'Continent' },
 ];
 
 const CAMPOS_PROCESO: { key: keyof Candidato; label: string }[] = [
@@ -212,7 +212,7 @@ export default function CandidatesPage() {
 
   return (
     <div className="mx-auto max-w-5xl p-4 sm:p-6">
-      <h1 className="mb-4 text-xl font-bold tracking-tight text-zinc-900 dark:text-white">Candidatos</h1>
+      <h1 className="mb-4 text-xl font-bold tracking-tight text-zinc-900 dark:text-white">Candidates</h1>
 
       <PageToolbar
         searchValue={busqueda}
@@ -235,7 +235,7 @@ export default function CandidatesPage() {
         dateToValue={filterDateTo}
         onDateFromChange={setFilterDateFrom}
         onDateToChange={setFilterDateTo}
-        dateLabel="Fecha contratación"
+        dateLabel="Hiring date"
         hasActiveFilters={hasActiveFilters}
         onClear={() => { setFilterStage(''); setFilterDateFrom(''); setFilterDateTo(''); }}
       />
@@ -249,7 +249,7 @@ export default function CandidatesPage() {
             <thead className="sticky top-0 bg-stone-50 dark:bg-zinc-900">
               <tr className="border-b border-stone-200 text-xs font-semibold uppercase tracking-wide text-zinc-400 dark:border-zinc-800 dark:text-zinc-500">
 
-                {editMode && <th className="whitespace-nowrap px-4 py-3 text-right font-medium">Acción</th>}
+                {editMode && <th className="whitespace-nowrap px-4 py-3 text-right font-medium">Action</th>}
                 {TODAS_LAS_COLUMNAS.map(({ key, label }) => (
                   <th key={key} className="whitespace-nowrap px-4 py-3 font-medium">{label}</th>
                 ))}              </tr>
@@ -264,7 +264,7 @@ export default function CandidatesPage() {
                         onClick={() => abrirEditar(c)}
                         className="text-sm font-medium text-zinc-500 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-teal-400"
                       >
-                        Editar
+                        Edit
                       </button>
                     </td>
                   )}
@@ -293,7 +293,7 @@ export default function CandidatesPage() {
                         <td key={key} className="whitespace-nowrap px-4 py-3">
                           {valor ? (
                             <a href={String(valor)} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline dark:text-blue-400">
-                              Ver perfil
+                              View profile
                             </a>
                           ) : '—'}
                         </td>
@@ -359,12 +359,12 @@ export default function CandidatesPage() {
         <div className="modal-backdrop fixed inset-0 flex items-center justify-center bg-black/40 p-4">
           <div className="modal-content max-h-[85vh] w-full max-w-2xl scroll-smooth overflow-y-auto rounded-2xl border border-stone-200 bg-white p-4 shadow-lg sm:p-6 dark:border-zinc-800 dark:bg-zinc-900">
             <h2 className="mb-4 text-lg font-bold tracking-tight text-zinc-900 dark:text-white">
-              {creandoNuevo ? 'New candidate' : `Editar: ${editando.name}`}
+              {creandoNuevo ? 'New candidate' : `Edit: ${editando.name}`}
             </h2>
 
             <form onSubmit={handleGuardar} className="flex flex-col gap-5">
               <div>
-                <label className={labelClass}>Nombre completo</label>
+                <label className={labelClass}>Full name</label>
                 <input
                   type="text"
                   value={editando.name}
@@ -420,7 +420,7 @@ export default function CandidatesPage() {
                     </div>
                   ))}
                   <div>
-                    <label className={labelClass}>Fecha de contratación</label>
+                    <label className={labelClass}>Hiring date</label>
                     <input
                       type="date"
                       value={editando.fechaContratacion?.slice(0, 10) ?? ''}
@@ -457,7 +457,7 @@ export default function CandidatesPage() {
                   onClick={() => setEditando(null)}
                   className="rounded-lg px-4 py-2 text-sm font-medium text-zinc-500 hover:bg-stone-100 dark:text-zinc-400 dark:hover:bg-white/5"
                 >
-                  Cancelar
+                  Cancel
                 </button>
                 <button
                   type="submit"

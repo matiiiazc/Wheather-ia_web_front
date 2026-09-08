@@ -27,7 +27,7 @@ export default function FileField({ label, value, onChange }: FileFieldProps) {
       const data = await apiFetchRaw('/uploads', { method: 'POST', body: formData });
       onChange(data.url);
     } catch {
-      setError('No se pudo subir el archivo');
+      setError('Could not upload the file');
     } finally {
       setSubiendo(false);
       e.target.value = '';
@@ -52,7 +52,7 @@ export default function FileField({ label, value, onChange }: FileFieldProps) {
               className="flex flex-1 items-center gap-2 truncate rounded-lg border border-stone-200 bg-stone-50 px-3 py-1.5 text-sm text-blue-600 hover:bg-stone-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-blue-400 dark:hover:bg-zinc-700"
             >
               <Eye size={14} />
-              Ver archivo
+              View file
             </button>
           </>
         ) : value ? (
@@ -64,12 +64,12 @@ export default function FileField({ label, value, onChange }: FileFieldProps) {
           </span>
         ) : (
           <span className="flex-1 truncate rounded-lg border border-stone-200 bg-stone-50 px-3 py-1.5 text-sm text-zinc-400 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-500">
-            Sin archivo
+            No file
           </span>
         )}
 
         <label className="cursor-pointer rounded-lg bg-stone-100 px-3 py-1.5 text-xs font-medium text-zinc-700 transition-colors hover:bg-stone-200 dark:bg-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-600">
-          {subiendo ? 'Subiendo...' : 'Subir'}
+          {subiendo ? 'Uploading...' : 'Upload'}
           <input type="file" onChange={handleFile} disabled={subiendo} className="hidden" />
         </label>
       </div>

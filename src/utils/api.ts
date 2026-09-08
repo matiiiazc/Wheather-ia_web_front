@@ -24,12 +24,12 @@ export async function apiFetch(path: string, options: RequestInit = {}) {
   if (response.status === 401) {
     limpiarSesion();
     window.location.reload(); // fuerza volver a mostrar el login
-    throw new Error('Sesión vencida');
+    throw new Error('Session expired');
   }
 
   if (!response.ok) {
     const data = await response.json().catch(() => ({}));
-    throw new Error(data.error || 'Error en la petición');
+    throw new Error(data.error || 'Request error');
   }
 
   return response.json();
@@ -55,12 +55,12 @@ export async function apiFetchRaw(path: string, options: RequestInit = {}) {
   if (response.status === 401) {
     limpiarSesion();
     window.location.reload();
-    throw new Error('Sesión vencida');
+    throw new Error('Session expired');
   }
 
   if (!response.ok) {
     const data = await response.json().catch(() => ({}));
-    throw new Error(data.error || 'Error en la petición');
+    throw new Error(data.error || 'Request error');
   }
 
   return response.json();

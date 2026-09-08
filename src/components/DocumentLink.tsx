@@ -8,7 +8,7 @@ interface DocumentLinkProps {
   label?: string;
 }
 
-export default function DocumentLink({ url, label = 'Ver archivo' }: DocumentLinkProps) {
+export default function DocumentLink({ url, label = 'View file' }: DocumentLinkProps) {
   const [showPreview, setShowPreview] = useState(false);
 
   if (!url) return <span className="text-zinc-400 dark:text-zinc-500">—</span>;
