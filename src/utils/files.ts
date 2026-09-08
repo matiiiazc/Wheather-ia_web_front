@@ -31,6 +31,10 @@ export function urlDeArchivo(valor: string | null | undefined): string | null {
     return conToken(`${API_ORIGIN}/${normalizado}`);
   }
 
+  if (normalizado.startsWith('api/archivos/')) {
+    return conToken(`${API_ORIGIN}/${normalizado}`);
+  }
+
   if (normalizado.startsWith('uploads/')) {
     return conToken(`${API_ORIGIN}/api/${normalizado}`);
   }

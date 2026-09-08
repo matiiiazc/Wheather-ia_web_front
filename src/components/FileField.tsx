@@ -24,7 +24,7 @@ export default function FileField({ label, value, onChange }: FileFieldProps) {
     try {
       const formData = new FormData();
       formData.append('file', file);
-      const data = await apiFetchRaw('/uploads', { method: 'POST', body: formData });
+      const data = await apiFetchRaw('/archivos', { method: 'POST', body: formData });
       onChange(data.url);
     } catch {
       setError('Could not upload the file');
